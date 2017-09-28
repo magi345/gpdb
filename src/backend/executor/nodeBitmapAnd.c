@@ -130,7 +130,7 @@ MultiExecBitmapAnd(BitmapAndState *node)
 
 	/* must provide our own instrumentation support */
 	if (node->ps.instrument)
-		InstrStartNode(node->ps.instrument);
+		INSTR_START_NODE(node->ps.instrument);
 
 	/*
 	 * get information from the node
@@ -208,7 +208,7 @@ MultiExecBitmapAnd(BitmapAndState *node)
 
 	/* must provide our own instrumentation support */
 	if (node->ps.instrument)
-        InstrStopNode(node->ps.instrument, empty ? 0 : 1);
+        	INSTR_STOP_NODE(node->ps.instrument, empty ? 0 : 1);
 
 	if (empty)
 	{
