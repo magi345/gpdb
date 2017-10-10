@@ -131,6 +131,7 @@
 #include "pg_trace.h"
 #include "tcop/tcopprot.h"
 #include "utils/debugbreak.h"
+#include "utils/query_metrics.h"
 
 #include "codegen/codegen_wrapper.h"
 
@@ -1059,6 +1060,13 @@ ExecProcNode(PlanState *node)
 	if(!node->fHadSentGpmon)
 		CheckSendPlanStateGpmonPkt(node);
 
+	if(!node->fHadSentMetrics)
+	{
+		/* GPDB send query metrics packet for node start executing */
+		UpdateNodeMetricsInfoPkt(node, Node_Executing);
+		node->fHadSentMetrics = true;
+	}
+
 	switch (nodeTag(node))
 	{
 			/*
@@ -1844,6 +1852,9 @@ ExecEndNode(PlanState *node)
 			elog(ERROR, "unrecognized node type: %d", (int) nodeTag(node));
 			break;
 	}
+
+	/* GPDB send query metrics packet for node finish */
+	UpdateNodeMetricsInfoPkt(node, Node_Finished);
 
 	if (node->instrument)
 		node->instrument = InstrShmemRecycle(node->instrument);
