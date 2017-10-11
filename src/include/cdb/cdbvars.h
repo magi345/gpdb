@@ -900,10 +900,10 @@ extern bool gp_disable_tuple_hints;
 /* Enable gpmon */
 extern bool gpvars_assign_gp_enable_gpperfmon(bool newval, bool doit, GucSource source);
 extern bool gpvars_assign_gp_gpperfmon_send_interval(int newval, bool doit, GucSource source);
-extern bool gpvars_assign_gp_enable_query_metrics(bool newval, bool doit, GucSource source);
 extern bool gp_enable_gpperfmon;
 extern int gp_gpperfmon_send_interval;
 extern bool gp_enable_query_metrics;
+extern int gp_query_metrics_port;
 extern bool force_bitmap_table_scan;
 
 extern bool dml_ignore_target_partition_check;

@@ -337,7 +337,6 @@ int			gp_workfile_type_hashjoin = 0;
 bool		gp_enable_gpperfmon = false;
 int			gp_gpperfmon_send_interval = 1;
 GpperfmonLogAlertLevel gpperfmon_log_alert_level = GPPERFMON_LOG_ALERT_LEVEL_NONE;
-bool		gp_enable_query_metrics = true;
 
 /* Enable single-slice single-row inserts ?*/
 bool		gp_enable_fast_sri = true;
@@ -1178,19 +1177,6 @@ gpvars_assign_gp_gpperfmon_log_alert_level(const char *newval, bool doit, GucSou
 	}
 
 	return newval;
-}
-
-/* gp_enable_query_metrics
- */
-bool
-gpvars_assign_gp_enable_query_metrics(bool newval, bool doit, GucSource source)
-{
-	if (doit)
-	{
-		gp_enable_query_metrics = newval;
-	}
-
-	return true;
 }
 
 const char *

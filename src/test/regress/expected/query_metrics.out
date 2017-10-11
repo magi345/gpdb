@@ -67,3 +67,44 @@ SELECT 1;
         1
 (1 row)
 
+-- default value
+SHOW GP_QUERY_METRICS_PORT;
+ gp_query_metrics_port
+-----------------------
+ 9898
+(1 row)
+
+SELECT 1;
+ ?column?
+----------
+        1
+(1 row)
+
+-- set value
+SET GP_QUERY_METRICS_PORT=9878;
+SHOW GP_QUERY_METRICS_PORT;
+ gp_query_metrics_port
+-----------------------
+ 9878
+(1 row)
+
+SELECT 1;
+ ?column?
+----------
+        1
+(1 row)
+
+-- reset
+RESET GP_QUERY_METRICS_PORT;
+SHOW GP_QUERY_METRICS_PORT;
+ gp_query_metrics_port
+-----------------------
+ 9898
+(1 row)
+
+SELECT 1;
+ ?column?
+----------
+        1
+(1 row)
+
