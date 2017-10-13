@@ -1822,6 +1822,11 @@ ExecEndNode(PlanState *node)
 			break;
 	}
 
+	if (node->instrument) {
+		InstrFree(node->instrument);
+		node->instrument = NULL;
+	}
+
 	if (codegen)
 	{
 		/*

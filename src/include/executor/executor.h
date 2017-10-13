@@ -498,6 +498,7 @@ extern GpExecIdentity getGpExecIdentity(QueryDesc *queryDesc,
 extern void mppExecutorFinishup(QueryDesc *queryDesc);
 extern void mppExecutorCleanup(QueryDesc *queryDesc);
 
+extern void InstrumentCleanup(PlanState *ps);
 
 /* prototypes defined in nodeAgg.c for rollup-aware Agg/Group nodes. */
 extern int64 tuple_grouping(TupleTableSlot *outerslot, int numGroupCols,

@@ -1028,6 +1028,10 @@ PortalRun(Portal portal, int64 count, bool isTopLevel,
 		if (portal->queryDesc)
 			mppExecutorCleanup(portal->queryDesc);
 
+		/* Cleanup Instrumentation slots */
+		if (portal->queryDesc && portal->queryDesc->planstate)
+			InstrumentCleanup(portal->queryDesc->planstate);
+
 		/* Restore global vars and propagate error */
 		if (saveMemoryContext == saveTopTransactionContext)
 			MemoryContextSwitchTo(TopTransactionContext);

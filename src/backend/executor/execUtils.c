@@ -66,6 +66,7 @@
 #include "cdb/cdbmotion.h"
 #include "cdb/cdbsreh.h"
 #include "cdb/memquota.h"
+#include "executor/instrument.h"
 #include "executor/spi.h"
 #include "utils/elog.h"
 #include "miscadmin.h"
@@ -2637,3 +2638,21 @@ void AssertSliceTableIsValid(SliceTable *st, struct PlannedStmt *pstmt)
 	}
 }
 #endif
+
+static CdbVisitOpt
+InstrumentFreeWalker(PlanState *node,
+					 void *context)
+{
+	if (node->instrument) {
+		InstrFree(node->instrument);
+		node->instrument = NULL;
+	}
+
+	return CdbVisit_Walk;
+}
+
+void InstrumentCleanup(PlanState *ps)
+{
+	if (ps)
+		planstate_walk_node(ps, InstrumentFreeWalker, NULL);
+}

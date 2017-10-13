@@ -16,20 +16,129 @@
 #include "postgres.h"
 
 #include <unistd.h>
+#include <cdb/cdbvars.h>
 
+#include "storage/spin.h"
 #include "executor/instrument.h"
 
+InstrumentationHeader *InstrumentGlobal = NULL;
+
+/* Allocate a header and an array of Instrumentation slots */
+Size
+InstrShmemSize(void)
+{
+	return sizeof(InstrumentationHeader) + MaxInstrumentationOnShmem * sizeof(InstrumentationSlot);
+}
+
+/* Initialize Shmem space to construct a free list of Instrumentation */
+void
+InstrShmemInit(void)
+{
+	Size size = InstrShmemSize();
+	InstrumentationSlot *slot;
+	InstrumentationHeader *header;
+	int i;
+
+	/* Allocate space from Shmem */
+	header = (InstrumentationHeader *)ShmemAlloc(size);
+	if (!header) {
+		ereport(FATAL, (errcode(ERRCODE_OUT_OF_MEMORY), errmsg("out of shared memory")));
+		return;
+	}
+
+	/* Initialize header and all slots to zeroes, then modify as needed */
+	MemSet(header, 0x00, size);
+
+	/* pointer to the first Instrumentation slot */
+	slot = (InstrumentationSlot*)(header + 1);
+
+	/* header points to the first slot */
+	header->head = slot;
+	header->in_use = 0;
+	header->free = MaxInstrumentationOnShmem;
+	SpinLockInit(&header->stat_lck);
+
+	/* Each slot points to next one to construct the free list */
+	for (i = 0; i < MaxInstrumentationOnShmem - 1; i++)
+		GetInstrumentNext(&slot[i]) = &slot[i + 1];
+	GetInstrumentNext(&slot[i]) = NULL;
+
+	/* Finished init the free list */
+	InstrumentGlobal = header;
+}
 
 /* Allocate new instrumentation structure(s) */
 Instrumentation *
 InstrAlloc(int n)
 {
-	Instrumentation *instr = palloc0(n * sizeof(Instrumentation));
+	/* GPDB not support trigger */
+	Assert(1 == n);
+
+	Instrumentation *instr = NULL;
+	InstrumentationSlot *slot = NULL;
+
+	if (gp_enable_query_metrics && NULL != InstrumentGlobal)
+	{
+		/* When query metrics on and instrumentation slots on Shmem is initialized */
+		SpinLockAcquire(&InstrumentGlobal->stat_lck);
+
+		/* Pick the first free slot */
+		slot = InstrumentGlobal->head;
+		if (NULL != slot)
+		{
+			/* Header points to the next free slot */
+			InstrumentGlobal->head = GetInstrumentNext(slot);
+			InstrumentGlobal->free--;
+			InstrumentGlobal->in_use++;
+		}
+		SpinLockRelease(&InstrumentGlobal->stat_lck);
+
+		if (NULL != slot) {
+			/* initialize the picked slot */
+			GetInstrumentNext(slot) = NULL;
+			instr = &(slot->data);
+			instr->in_shmem = true;
+		}
+	}
+
+	if (NULL == instr)
+	{
+		/* Alloc Instrumentation in local memory */
+		/* When gp_enable_query_metrics is off, the Instrumentation reside on local memory by default */
+		/* When gp_enable_query_metrics is on but failed to pick a slot, also fallback to local memory */
+		instr = palloc0(n * sizeof(Instrumentation));
+	}
 
 	/* we don't need to do any initialization except zero 'em */
 	instr->numPartScanned = 0;
 
 	return instr;
+}
+
+void
+InstrFree(Instrumentation *instr)
+{
+	InstrumentationSlot *slot;
+
+	if (NULL == instr)
+		return;
+	if (NULL == InstrumentGlobal)
+		return;
+
+	/* Recycle Instrumentation slot back to the free list */
+	if (instr->in_shmem) {
+		slot = (InstrumentationSlot*) instr;
+		MemSet(slot, 0x00, sizeof(InstrumentationSlot));
+
+		SpinLockAcquire(&InstrumentGlobal->stat_lck);
+
+		GetInstrumentNext(slot) = InstrumentGlobal->head;
+		InstrumentGlobal->head = slot;
+		InstrumentGlobal->free++;
+		InstrumentGlobal->in_use--;
+
+		SpinLockRelease(&InstrumentGlobal->stat_lck);
+	}
 }
 
 /* Entry to a plan node */

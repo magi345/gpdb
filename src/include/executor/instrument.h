@@ -22,6 +22,7 @@ struct CdbExplain_NodeSummary;          /* private def in cdb/cdbexplain.c */
 
 typedef struct Instrumentation
 {
+	bool		in_shmem;		/* TRUE if this instrument in alloced in shmem, used for recycle */
 	/* Info about current plan cycle: */
 	bool		running;		/* TRUE if we've completed first tuple */
 	instr_time	starttime;		/* Start time of current iteration of node */
@@ -50,4 +51,26 @@ extern void InstrStartNode(Instrumentation *instr);
 extern void InstrStopNode(Instrumentation *instr, double nTuples);
 extern void InstrEndLoop(Instrumentation *instr);
 
+typedef struct InstrumentationHeader
+{
+	void *head;
+	int in_use;
+	int free;
+	slock_t	stat_lck;
+} InstrumentationHeader;
+
+typedef struct InstrumentationSlot
+{
+	Instrumentation data;
+	int16 segid;
+	int32 pid;
+	int16 nid;
+} InstrumentationSlot;
+
+#define MaxInstrumentationOnShmem 20000
+extern InstrumentationHeader *InstrumentGlobal;
+extern Size InstrShmemSize(void);
+extern void InstrShmemInit(void);
+extern void InstrFree(Instrumentation *instr);
+#define GetInstrumentNext(ptr) (*((InstrumentationSlot **)(ptr+1) - 1))
 #endif   /* INSTRUMENT_H */
