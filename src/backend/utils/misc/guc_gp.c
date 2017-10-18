@@ -2043,6 +2043,15 @@ struct config_bool ConfigureNamesBool_gp[] =
 	},
 
 	{
+		{"gp_enable_query_metrics", PGC_USERSET, UNGROUPED,
+			gettext_noop("Enable query execution metrics collection."),
+			NULL,
+		},
+		&gp_enable_query_metrics,
+		true, gpvars_assign_gp_enable_query_metrics, NULL
+	},
+
+	{
 		{"gp_mapreduce_define", PGC_USERSET, DEVELOPER_OPTIONS,
 			gettext_noop("Prepare mapreduce object creation"),	/* turn off statement
 																 * logging */
