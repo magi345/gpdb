@@ -98,6 +98,8 @@ InstrAlloc(int n)
 			GetInstrumentNext(slot) = NULL;
 			instr = &(slot->data);
 			instr->in_shmem = true;
+			slot->segid = Gp_segment;
+			slot->pid = MyProcPid;
 		}
 	}
 

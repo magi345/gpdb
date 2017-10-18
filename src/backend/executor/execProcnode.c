@@ -830,7 +830,13 @@ ExecInitNode(Plan *node, EState *estate, int eflags)
 
 	/* Set up instrumentation for this node if requested */
 	if (estate->es_instrument && result != NULL)
+	{
 		result->instrument = InstrAlloc(1);
+		if (result->instrument->in_shmem)
+		{
+			((InstrumentationSlot*)result->instrument)->nid = node->plan_node_id;
+		}
+	}
 
 	if (result != NULL)
 	{
