@@ -145,7 +145,7 @@ static void intorel_shutdown(DestReceiver *self);
 static void intorel_destroy(DestReceiver *self);
 
 static void FillSliceTable(EState *estate, PlannedStmt *stmt);
-static void InitNodeMetrics(PlannedStmt *plannedstmt);
+static void InitNodeMetrics(QueryDesc *qd);
 
 void ExecCheckRTPerms(List *rangeTable);
 void ExecCheckRTEPerms(RangeTblEntry *rte);
@@ -279,6 +279,7 @@ ExecutorStart(QueryDesc *queryDesc, int eflags)
 		&& queryDesc->gpmon_pkt)
 	{
 		gpmon_qlog_query_start(queryDesc->gpmon_pkt);
+		metrics_send_query_info(queryDesc, METRICS_QUERY_START);
 	}
 
 	/**
@@ -1103,6 +1104,7 @@ ExecutorEnd(QueryDesc *queryDesc)
 			&& queryDesc->gpmon_pkt)
 	{			
 		gpmon_qlog_query_end(queryDesc->gpmon_pkt);
+		metrics_send_query_info(queryDesc, METRICS_QUERY_DONE);
 		queryDesc->gpmon_pkt = NULL;
 	}
 
@@ -1884,7 +1886,7 @@ InitPlan(QueryDesc *queryDesc, int eflags)
 	planstate = ExecInitNode(start_plan_node, estate, eflags);
 
 	/* GPDB emit plan node init info */
-	InitNodeMetrics(plannedstmt);
+	InitNodeMetrics(queryDesc);
 
 	queryDesc->planstate = planstate;
 
@@ -5792,6 +5794,7 @@ typedef struct InitNodeMetricsContext
 {
 	plan_tree_base_prefix base; /* Required prefix for plan_tree_walker/mutator */
 	Plan *parent;
+	QueryDesc *qd;
 } InitNodeMetricsContext;
 
 static bool
@@ -5809,6 +5812,7 @@ InitNodeMetrics_walker(Node *node, InitNodeMetricsContext *context)
 	{
 		ctx = (InitNodeMetricsContext*) palloc0(sizeof(InitNodeMetricsContext));
 		ctx->base = context->base;
+		ctx->qd = context->qd;
 
 		plan = (Plan *) node;
 		ctx->parent = plan;
@@ -5818,7 +5822,7 @@ InitNodeMetrics_walker(Node *node, InitNodeMetricsContext *context)
 		else
 			plan->plan_parent_node_id = (-1);
 
-		InitNodeMetricsInfoPkt(plan);
+		InitNodeMetricsInfoPkt(plan, ctx->qd);
 	}
 
 	/* Continue walking */
@@ -5830,14 +5834,15 @@ InitNodeMetrics_walker(Node *node, InitNodeMetricsContext *context)
  * Send initial Qexec packet to gp_query_metrics_port
  */
 static void
-InitNodeMetrics(PlannedStmt *plannedstmt)
+InitNodeMetrics(QueryDesc *qd)
 {
 	InitNodeMetricsContext ctx;
 	plan_tree_base_prefix base;
 
-	base.node = (Node*)plannedstmt;
+	base.node = (Node*)qd->plannedstmt;
 	ctx.base = base;
+	ctx.qd = qd;
 	ctx.parent = NULL;
-	InitNodeMetrics_walker((Node*)plannedstmt->planTree, &ctx);
+	InitNodeMetrics_walker((Node*)qd->plannedstmt->planTree, &ctx);
 }
 
