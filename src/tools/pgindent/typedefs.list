@@ -1363,6 +1363,8 @@ InputRecordType
 InsertStmt
 instr_time
 Instrumentation
+InstrumentationHeader
+InstrumentationSlot
 INT
 int16
 int16_t
@@ -1577,6 +1579,14 @@ MergeJoinClause
 MergeJoinState
 MergePath
 MergeScanSelCache
+MetricsNodeStatus
+MetricsQueryStatus
+metrics_query_id
+metrics_query_t
+metrics_packet_t
+metrics_pkttype_t
+metrics_node_t
+metrics_conn
 MinimalTuple
 MinimalTupleData
 Minipage
