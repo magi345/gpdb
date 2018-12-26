@@ -730,6 +730,7 @@ increment_command_count()
 	{
 		gp_command_count = 1;
 	}
+	MyProc->queryCommandId = gp_command_count;
 }
 
 Datum mpp_execution_segment(PG_FUNCTION_ARGS);

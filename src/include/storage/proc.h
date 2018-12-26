@@ -168,6 +168,12 @@ struct PGPROC
 	 */
 	uint32		combocid_map_count; /* how many entries in the map ? */
 
+	/*
+	 * Current command_id for the running query
+	 * Required by Command Center for monitoring purpose
+	 */
+	int			queryCommandId;
+
 	bool serializableIsoLevel; /* true if proc has serializable isolation level set */
 
 	/*
