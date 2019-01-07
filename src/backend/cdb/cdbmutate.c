@@ -1977,6 +1977,22 @@ assign_plannode_id_walker(Node *node, assign_plannode_id_walker_context *ctxt)
 		foreach(cell, app->appendplans)
 			assign_plannode_id_walker((Node *) lfirst(cell), ctxt);
 	}
+	else if (IsA(node, MergeAppend))
+	{
+		ListCell *cell;
+		MergeAppend *mapp = (Append *) node;
+
+		foreach(cell, mapp->mergeplans)
+			assign_plannode_id_walker((Node *)lfirst(cell), ctxt);
+	}
+	else if (IsA(node, ModifyTable))
+	{
+		ListCell *cell;
+		ModifyTable *mt = (Sequence *) node;
+
+		foreach(cell, mt->plans)
+			assign_plannode_id_walker((Node *)lfirst(cell), ctxt);
+	}
 	else if (IsA(node, BitmapAnd))
 	{
 		ListCell   *cell;
