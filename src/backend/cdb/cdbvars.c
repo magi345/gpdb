@@ -721,6 +721,7 @@ gpvars_check_statement_mem(int *newval, void **extra, GucSource source)
 /*
  * increment_command_count
  *	  Increment gp_command_count. If the new command count is 0 or a negative number, reset it to 1.
+ *	  And keep MyProc->queryCommandId synced with gp_command_count.
  */
 void
 increment_command_count()
