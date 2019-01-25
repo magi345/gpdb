@@ -731,7 +731,7 @@ increment_command_count()
 		gp_command_count = 1;
 
 	/*
-	 * No need to maintenance MyProc->queryCommandId elsewhere, we guarantee
+	 * No need to maintain MyProc->queryCommandId elsewhere, we guarantee
 	 * they are always synced here.
 	 */
 	MyProc->queryCommandId = gp_command_count;
