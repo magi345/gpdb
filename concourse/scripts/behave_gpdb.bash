@@ -66,6 +66,8 @@ function _main() {
         exit 1
     fi
 
+    yum remove -y apr-util
+
     time install_gpdb
     time ./gpdb_src/concourse/scripts/setup_gpadmin_user.bash
 
