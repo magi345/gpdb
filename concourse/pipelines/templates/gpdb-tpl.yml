@@ -336,6 +336,7 @@ resource_types:
 resources:
 {% if ("ICW"    in test_sections and "sles" in os_types) or
       "ResourceGroups"     in test_sections or
+      ("Gpperfmon"    in test_sections and "sles" in os_types) or
       "CLI"      in test_sections %}
 - name: ccp_src
   type: git
