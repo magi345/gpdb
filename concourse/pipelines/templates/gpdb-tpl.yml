@@ -252,6 +252,24 @@ groups:
 {% endif %}
 
 {% endif %}
+{% if "Gpperfmon" in test_sections %}
+## ======================================================================
+
+- name: Gpperfmon
+  jobs:
+  - gate_gpperfmon_start
+  - gpperfmon_centos6
+  - compile_gpdb_centos6
+{% if "centos7" in os_types %}
+  - gpperfmon_centos7
+  - compile_gpdb_centos7
+{% endif %}
+{% if "sles" in os_types %}
+  - gpperfmon_sles12
+  - compile_gpdb_sles11
+{% endif %}
+
+{% endif %}
 {% if "CLI" in test_sections %}
 ## ======================================================================
 
