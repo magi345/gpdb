@@ -66,10 +66,12 @@ function _main() {
         exit 1
     fi
 
-    time install_gpdb
-    time ./gpdb_src/concourse/scripts/setup_gpadmin_user.bash
+    if [ "GPSKIP_INIT" = "false" ]; then
+        time install_gpdb
+        time ./gpdb_src/concourse/scripts/setup_gpadmin_user.bash
 
-    time make_cluster
+        time make_cluster
+    fi
 
     time gen_env
 
