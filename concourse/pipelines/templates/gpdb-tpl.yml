@@ -83,6 +83,17 @@ groups:
   - resource_group_sles12
 {% endif %}
 {% endif %}
+{% if "Gpperfmon" in test_sections %}
+  ## --------------------------------------------------------------------
+  - gate_gpperfmon_start
+  - gpperfmon_centos6
+{% if "centos7" in os_types %}
+  - gpperfmon_centos7
+{% endif %}
+{% if "sles" in os_types %}
+  - gpperfmon_sles12
+{% endif %}
+{% endif %}
 {% if "CLI" in test_sections %}
   ## --------------------------------------------------------------------
   - gate_cli_start
