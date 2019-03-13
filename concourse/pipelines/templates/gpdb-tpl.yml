@@ -2283,6 +2283,9 @@ jobs:
  ##     - icw_extensions_gpcloud_ubuntu16
       - resource_group_centos6
       - resource_group_centos7
+      - gpperfmon_centos6
+      - gpperfmon_centos7
+      - gpperfmon_sles12
  ##     - resource_group_sles12
 {% for test_name in CLI_1_suites +
                     CLI_2_suites %}
