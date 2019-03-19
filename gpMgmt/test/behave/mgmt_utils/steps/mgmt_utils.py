@@ -1748,14 +1748,11 @@ def impl(context, table_name, db_name):
         dbconn.execSQL(conn, index_qry)
         conn.commit()
 
-@when("install gpperfmon")
+@when("the user installs gpperfmon")
 def impl(context):
     master_port = os.getenv('PGPORT', 15432)
     cmd = "gpperfmon_install --port {master_port} --enable --password foo".format(master_port=master_port)
     run_command(context, cmd)
-
-    if context.ret_code != 0:
-        raise Exception('%s' % context.error_message)
 
 @given('gpperfmon is configured and running in qamode')
 @then('gpperfmon is configured and running in qamode')

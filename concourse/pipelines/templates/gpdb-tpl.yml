@@ -1785,7 +1785,7 @@ jobs:
   - task: gpinitsystem
     file: ccp_src/ci/tasks/gpinitsystem.yml
   - task: run_tests
-    file: gpdb_src/concourse/tasks/run_behave_sles12.yml
+    file: gpdb_src/concourse/tasks/run_behave_on_ccp_cluster.yml
     image: ccp-image
     params:
       BEHAVE_FLAGS: --tags=gpperfmon
