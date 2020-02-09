@@ -1249,14 +1249,6 @@ ExecEndMotion(MotionState *node)
 	if (node->outputFunArray)
 		pfree(node->outputFunArray);
 #endif
-
-	/*
-	 * Temporarily set currentExecutingSliceId to the parent value, since this
-	 * motion might be in the top slice of an InitPlan.
-	 */
-	node->ps.state->currentExecutingSliceId = parentExecutingSliceId;
-	EndPlanStateGpmonPkt(&node->ps);
-	node->ps.state->currentExecutingSliceId = motNodeID;
 }
 
 

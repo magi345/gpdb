@@ -30,7 +30,6 @@ ifeq ($(with_openssl), yes)
 	$(MAKE) -C contrib/sslinfo all
 endif
 	$(MAKE) -C gpAux/extensions all
-	$(MAKE) -C gpAux/gpperfmon all
 	$(MAKE) -C gpAux/platform all
 	$(MAKE) -C gpMgmt all
 	$(MAKE) -C gpcontrib all
@@ -99,7 +98,6 @@ clean:
 # gpAux/Makefile is the entry point for the enterprise build, which ends up
 # calling top-level configure and this Makefile
 	$(MAKE) -C gpAux/extensions $@
-	$(MAKE) -C gpAux/gpperfmon $@
 	$(MAKE) -C gpAux/platform $@
 	$(MAKE) -C gpMgmt $@
 
@@ -108,7 +106,6 @@ clean:
 distclean maintainer-clean:
 #	$(MAKE) -C doc $@
 	$(MAKE) -C gpAux/extensions $@
-	$(MAKE) -C gpAux/gpperfmon $@
 	$(MAKE) -C gpAux/platform $@
 	$(MAKE) -C contrib $@
 	$(MAKE) -C gpcontrib $@
