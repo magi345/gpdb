@@ -123,11 +123,10 @@
 #include "postmaster/pgarch.h"
 #include "postmaster/postmaster.h"
 #include "postmaster/fts.h"
-#include "postmaster/perfmon.h"
 #include "postmaster/syslogger.h"
 #include "postmaster/backoff.h"
-#include "postmaster/perfmon_segmentinfo.h"
 #include "postmaster/bgworker.h"
+#include "postmaster/segment_info_sender.h"
 #include "replication/walsender.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
@@ -407,13 +406,6 @@ static BackgroundWorker PMAuxProcList[MaxPMAuxProc] =
 	 0, /* restart immediately if sweeper process exits with non-zero code */
 	 BackoffSweeperMain, {0}, {0}, 0, {0}, 0,
 	 BackoffSweeperStartRule},
-
-	{"perfmon process",
-	 BGWORKER_SHMEM_ACCESS,
-	 BgWorkerStart_RecoveryFinished,
-	 0, /* restart immediately if perfmon process exits with non-zero code */
-	 PerfmonMain, {0}, {0}, 0, {0}, 0,
-	 PerfmonStartRule},
 };
 
 static bool ReachedNormalRunning = false;		/* T if we've reached PM_RUN */
@@ -772,7 +764,7 @@ PostmasterMain(int argc, char *argv[])
 			 * but we co-opted this letter for this... I'm afraid to change it,
 			 * because I don't know where this is used.
              * ... it's used only here in postmaster.c; it causes the postmaster to
-			 * fork a QD specific process. For example, FTS, perfmon, global
+			 * fork a QD specific process. For example, FTS, global
 			 * deadlock detector.
 			 */
 			case 'E':
