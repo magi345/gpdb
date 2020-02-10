@@ -59,7 +59,6 @@ JOBS_THAT_ARE_GATES = [
     'gate_icw_end',
     'gate_replication_start',
     'gate_resource_groups_start',
-    'gate_gpperfmon_start',
     'gate_cli_start',
     'gate_ud_start',
     'gate_advanced_analytics_start',
@@ -331,8 +330,7 @@ def main():
             'CLI',
             'UD',
             'AA',
-            'Extensions',
-            'Gpperfmon'
+            'Extensions'
         ],
         default=['ICW'],
         nargs='+',
@@ -379,7 +377,6 @@ def main():
             'UD',
             'AA',
             'Extensions',
-            'Gpperfmon'
         ]
 
     # if generating a dev pipeline but didn't specify an output,

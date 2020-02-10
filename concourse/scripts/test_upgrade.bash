@@ -440,8 +440,7 @@ while read -u30 hostname datadir; do
         --exclude /postmaster.opts \
         --exclude /gp_replication.conf \
         --exclude /gp_dbid \
-        --exclude /gpssh.conf \
-        --exclude /gpperfmon/
+        --exclude /gpssh.conf
 
     run_upgrade "$hostname" "$datadir" --mode=segment \
         --old-gp-dbid=${segment_gp_dbid} --new-gp-dbid=${segment_gp_dbid}
