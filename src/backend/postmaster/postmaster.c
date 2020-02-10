@@ -5393,16 +5393,6 @@ SubPostmasterMain(int argc, char *argv[])
 
 		SysLoggerMain(argc, argv);		/* does not return */
 	}
-	if (strcmp(argv[1], "--forkperfmon") == 0)
-	{
-		/* Close the postmaster's sockets */
-		ClosePostmasterPorts(false);
-
-		/* Do not want to attach to shared memory */
-
-		PerfmonMain(argc - 2, argv + 2);
-		proc_exit(0);
-	}
 
 	abort();					/* shouldn't get here */
 }

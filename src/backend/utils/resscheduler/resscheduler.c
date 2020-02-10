@@ -801,8 +801,7 @@ ResLockUtilityPortal(Portal portal, float4 ignoreCostLimit)
 			ResLockRelease(&tag, portal->portalId);
 
 			/*
-			 * Perfmon related stuff: clean up if we got cancelled
-			 * while waiting.
+			 * Clean up if we got cancelled while waiting.
 			 */
 
 			portal->queueId = InvalidOid;
