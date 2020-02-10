@@ -1766,7 +1766,7 @@ def impl(context, proc):
 @then('wait until the results from boolean sql "{sql}" is "{boolean}"')
 @given('wait until the results from boolean sql "{sql}" is "{boolean}"')
 def impl(context, sql, boolean):
-    cmd = Command(name='psql', cmdStr='psql --tuples-only -d gpperfmon -c "%s"' % sql)
+    cmd = Command(name='psql', cmdStr='psql --tuples-only -d postgres -c "%s"' % sql)
     start_time = current_time = datetime.now()
     result = None
     while (current_time - start_time).seconds < 120:
