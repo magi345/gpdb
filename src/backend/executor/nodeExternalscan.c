@@ -323,7 +323,6 @@ ExecEndExternalScan(ExternalScanState *node)
 		node->ss.ss_currentRelation = NULL;
 		ExecCloseScanRelation(relation);
 	}
-	EndPlanStateGpmonPkt(&node->ss.ps);
 }
 
 

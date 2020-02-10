@@ -280,6 +280,5 @@ ExecEndDML(DMLState *node)
 	ExecClearTuple(node->ps.ps_ResultTupleSlot);
 	ExecClearTuple(node->cleanedUpSlot);
 	ExecEndNode(outerPlanState(node));
-	EndPlanStateGpmonPkt(&node->ps);
 }
 /* EOF */
