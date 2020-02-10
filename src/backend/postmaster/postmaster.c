@@ -122,7 +122,6 @@
 #include "postmaster/syslogger.h"
 #include "postmaster/backoff.h"
 #include "postmaster/bgworker.h"
-#include "postmaster/segment_info_sender.h"
 #include "replication/walsender.h"
 #include "storage/fd.h"
 #include "storage/ipc.h"
@@ -137,6 +136,7 @@
 #include "utils/faultinjector.h"
 #include "utils/gdd.h"
 #include "utils/memutils.h"
+#include "utils/metrics_utils.h"
 #include "utils/ps_status.h"
 #include "utils/timeout.h"
 
@@ -391,13 +391,6 @@ static BackgroundWorker PMAuxProcList[MaxPMAuxProc] =
 	 DtxRecoveryMain, {0}, {0}, 0, 0,
 	 DtxRecoveryStartRule},
 
-	{"stats sender process",
-	 BGWORKER_SHMEM_ACCESS,
-	 BgWorkerStart_RecoveryFinished,
-	 0, /* restart immediately if stats sender exits with non-zero code */
-	 SegmentInfoSenderMain, {0}, {0}, 0, 0,
-	 SegmentInfoSenderStartRule},
-
 	{"sweeper process",
 	 BGWORKER_SHMEM_ACCESS,
 	 BgWorkerStart_RecoveryFinished,
@@ -628,6 +621,12 @@ int			postmaster_alive_fds[2] = {-1, -1};
 /* Process handle of postmaster used for the same purpose on Windows */
 HANDLE		PostmasterHandle;
 #endif
+
+/*
+ * query info collector hook
+ * Use this hook to collect real-time query information and status data.
+ */
+query_info_collect_hook_type query_info_collect_hook = NULL;
 
 /*
  * Postmaster main entry point
