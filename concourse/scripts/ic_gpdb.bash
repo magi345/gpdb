@@ -34,7 +34,28 @@ function gen_env(){
 		fi
 		cd "\${1}/gpdb_src"
 		source gpAux/gpdemo/gpdemo-env.sh
+
+		# enable metrics_collector
+		gpperfmon_install --enable --password changeme --port 6000
+		gpconfig -c gp_enable_gpperfmon -v off
+		gpstop -arf
+		psql -U gpmon -c "create extension metrics_collector;select pg_sleep(5);" gpperfmon
+		ps aux | grep bgworker | grep "metrics collector" | grep -v grep
+
+		#verify metrics_collector is working
+		sleep 5
+		pushd \$MASTER_DATA_DIRECTORY/pg_log
+		export AAA=\`grep -Ri "Metrics Collector access spill data" . | wc -l\`
+		if [ \$AAA -gt 0 ]; then echo "good metrics_collector"; else echo "bad metrics_collector"; exit 1; fi
+		popd
+
 		make -s ${MAKE_TEST_COMMAND}
+
+		#verify no problem log
+		pushd \$MASTER_DATA_DIRECTORY/pg_log
+		export BBB=\`grep -Ri "num_active" . | wc -l\`
+		if [ \$BBB -gt 0 ]; then echo "bad num_active"; exit 1; else echo "no num_active, good"; fi
+		popd
 	EOF
 
 	chmod a+x /opt/run_test.sh
